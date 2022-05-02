@@ -1,0 +1,6 @@
+train_path : "/home/studio-lab-user/tamil_atis/data/train_intent.pkl"
+valid_path : "/home/studio-lab-user/tamil_atis/data/val_intent.pkl"
+test_path : "/home/studio-lab-user/tamil_atis/data/test_intent.pkl"
+output_dir: "/home/studio-lab-user/tamil_atis/saved_models"
+num_labels: 78
+num_intents: 23
