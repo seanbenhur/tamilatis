@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class ATISTrainer:
+    """A Trainer class consists of utitlity functions for training the model"""
     def __init__(
         self,
         model,

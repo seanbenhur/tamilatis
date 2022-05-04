@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from huggingface_hub import PyTorchModelHubMixin
 from transformers import AutoConfig, AutoModelForTokenClassification

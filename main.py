@@ -2,6 +2,7 @@ import logging
 import os
 import pickle
 
+import wandb
 import hydra
 import pandas as pd
 import torch.nn as nn
@@ -22,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 @hydra.main(config_path="./configs", config_name="config")
 def main(cfg):
+
+    os.environ['WANDB_PROJECT'] = cfg.wandb.project_name
+    os.environ['WANDB_RUN_GROUP'] = cfg.wandb.group_name
+    os.environ['WANDB_NAME'] = cfg.wandb.run_name
     logger.info(OmegaConf.to_yaml(cfg, resolve=True))
     accelerator = Accelerator()
     # Get all tags
@@ -126,7 +131,7 @@ def main(cfg):
     )
     # Register the LR scheduler
     accelerator.register_for_checkpointing(scheduler)
-
+    run = wandb.init("tamilatis", "test")
     if cfg.training.do_train:
         trainer = ATISTrainer(
             model,
@@ -137,9 +142,7 @@ def main(cfg):
             cfg.dataset.output_dir,
             cfg.dataset.num_labels,
             cfg.dataset.num_intents,
-            cfg.wandb.project_name,
-            cfg.wandb.group_name,
-            cfg.wandb.run_name,
+            run
         )
         best_model, best_loss = trainer.fit(
             cfg.training.max_epochs, train_dl, val_dl, cfg.training.patience
