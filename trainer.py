@@ -22,9 +22,7 @@ class ATISTrainer:
         output_dir,
         num_labels,
         num_intents,
-        wandb_project_name,
-        wandb_group_name,
-        wandb_run_name,
+        run
     ):
         self.model = model
         self.criterion = criterion
@@ -85,9 +83,12 @@ class ATISTrainer:
             self.accelerator.backward(train_loss)
             self.optimizer.step()
 
-            if not self.accelerator.optimizer_step_was_skipped:
+            if self.scheduler is not None:
+              if not self.accelerator.optimizer_step_was_skipped:
                 self.scheduler.step()
-            self.scheduler.step()
+
+            if self.scheduler is not None:
+              self.scheduler.step()
 
             intent_acc = accuracy(
                 intent_preds, intents, num_classes=self.num_intents, average="weighted"

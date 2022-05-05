@@ -119,19 +119,21 @@ def main(cfg):
         len(train_dl) / cfg.training.batch_size * cfg.training.max_epochs
     )
 
-    scheduler = get_scheduler(
+    if cfg.training.scheduler is not None:
+      scheduler = get_scheduler(
         cfg.training.scheduler,
         optimizer,
         num_warmup_steps=cfg.training.warmup_steps,
-        num_training_steps=nb_train_steps,
-    )
+        num_training_steps=nb_train_steps)
+      # Register the LR scheduler
+      accelerator.register_for_checkpointing(scheduler)
 
+    scheduler = None
     model, optimizer, train_dl, val_dl = accelerator.prepare(
         model, optimizer, train_dl, val_dl
     )
-    # Register the LR scheduler
-    accelerator.register_for_checkpointing(scheduler)
-    run = wandb.init("tamilatis", "test")
+    
+    run = wandb.init(cfg.wandb.project_name,cfg.wandb.group_name,cfg.wandb.run_name)
     if cfg.training.do_train:
         trainer = ATISTrainer(
             model,
