@@ -4,7 +4,6 @@ from tqdm import tqdm
 from transformers import AutoTokenizer
 
 
-
 class TamilATISPredictor:
     def __init__(
         self,

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class ATISTrainer:
     """A Trainer class consists of utitlity functions for training the model"""
+
     def __init__(
         self,
         model,
@@ -22,7 +23,7 @@ class ATISTrainer:
         output_dir,
         num_labels,
         num_intents,
-        run
+        run,
     ):
         self.model = model
         self.criterion = criterion
@@ -36,7 +37,7 @@ class ATISTrainer:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-        self.run = wandb.init(wandb_project_name, wandb_group_name)
+        self.run = run
 
         logging.info(f"Strating Training, outputs are saved in {self.output_dir}")
 
@@ -84,11 +85,11 @@ class ATISTrainer:
             self.optimizer.step()
 
             if self.scheduler is not None:
-              if not self.accelerator.optimizer_step_was_skipped:
-                self.scheduler.step()
+                if not self.accelerator.optimizer_step_was_skipped:
+                    self.scheduler.step()
 
             if self.scheduler is not None:
-              self.scheduler.step()
+                self.scheduler.step()
 
             intent_acc = accuracy(
                 intent_preds, intents, num_classes=self.num_intents, average="weighted"
