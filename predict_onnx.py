@@ -16,10 +16,11 @@ class TamilATISPredictor:
         num_labels,
     ):
         self.model = model
-        self.model.load_state_dict(torch.load(checkpoint_path,map_location="cpu"))
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model.load_state_dict(torch.load(checkpoint_path,map_location=self.device))
         self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer)
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+       
         self.num_labels = num_labels
         self.label_encoder = label_encoder
         self.intent_encoder = intent_encoder
@@ -39,13 +40,15 @@ class TamilATISPredictor:
         mask = inputs["attention_mask"].cpu().numpy()
         sess_options = onnxruntime.SessionOptions()
 
-        export_model_path = "/content/outputs/2022-05-10/16-36-20/model.onnx"
+        export_model_path = "/content/outputs/2022-05-12/10-22-58/model.onnx"
 
         session = onnxruntime.InferenceSession(export_model_path, sess_options, providers=['CPUExecutionProvider'])
-        label = np.array([0])
+        #label = np.array([60],[60])
+        label = np.empty((60,60),dtype='int64')
         ort_inputs = {"input_ids":ids,
                         "attention_mask": mask,
-                        'labels': label}
+              }
+        print(f"IDS SHAPE {ids.shape}")
         # forward pass
         #loss_dict = self.model(input_ids=ids, attention_mask=mask, labels=None)
         loss_dict = session.run(None, ort_inputs)

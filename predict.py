@@ -15,7 +15,8 @@ class TamilATISPredictor:
         num_labels,
     ):
         self.model = model
-        self.model.load_state_dict(torch.load(checkpoint_path))
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model.load_state_dict(torch.load(checkpoint_path,map_location=self.device))
         self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"

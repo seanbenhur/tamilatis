@@ -21,8 +21,9 @@ num_intents = 23
 def main(cfg):
     logger.info("Building Dataset")
     data_utils = BuildDataset()
-    test_data = data_utils.build_dataset(cfg.dataset.test_data_path)
+    test_data = data_utils.build_dataset(cfg.dataset.test_path)
 
+    device = "cuda" if torch.cuda.is_available() else 'cpu'
     annotations, intents, count = set(), set(), 0
     for boi_data, intent in test_data:
         if intent[0] == "B" or intent[0] == "I":
@@ -52,7 +53,7 @@ def main(cfg):
     model = JointATISModel(
         cfg.model.model_name, cfg.model.num_labels, cfg.model.num_intents
     )
-    model.load_state_dict(torch.load(cfg.model.test_model))
+    model.load_state_dict(torch.load(cfg.model.test_model,map_location=device))
     logging.info(f"Model loaded from {cfg.model.test_model}")
     model.eval()
     input_ids = example["input_ids"]
