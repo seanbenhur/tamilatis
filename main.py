@@ -11,10 +11,11 @@ from accelerate import Accelerator
 from omegaconf.omegaconf import OmegaConf
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
+import torch
 from transformers import AutoTokenizer, get_scheduler
 
 from dataset import ATISDataset, BuildDataset
-from model import JointATISModel
+from model import JointATISPtunedModel
 from predict import TamilATISPredictor
 from trainer import ATISTrainer
 
@@ -26,7 +27,7 @@ def main(cfg):
 
     os.environ['WANDB_PROJECT'] = cfg.wandb.project_name
     os.environ['WANDB_RUN_GROUP'] = cfg.wandb.group_name
-    os.environ['WANDB_NAME'] = cfg.wandb.run_name
+    #os.environ['WANDB_NAME'] = cfg.wandb.run_name
     logger.info(OmegaConf.to_yaml(cfg, resolve=True))
     accelerator = Accelerator()
     # Get all tags
@@ -89,7 +90,7 @@ def main(cfg):
     )
     logging.info("DataLoaders are created!")
 
-    model = JointATISModel(
+    model = JointATISPtunedModel(
         cfg.model.model_name, cfg.model.num_labels, cfg.model.num_intents
     )
     criterion = nn.CrossEntropyLoss()
@@ -120,11 +121,12 @@ def main(cfg):
     )
 
     if cfg.training.scheduler is not None:
-      scheduler = get_scheduler(
-        cfg.training.scheduler,
-        optimizer,
-        num_warmup_steps=cfg.training.warmup_steps,
-        num_training_steps=nb_train_steps)
+      scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95, verbose=True)
+      #scheduler = get_scheduler(
+      #  cfg.training.scheduler,
+       # optimizer,
+       # num_warmup_steps=cfg.training.warmup_steps,
+       # num_training_steps=nb_train_steps)
       # Register the LR scheduler
       accelerator.register_for_checkpointing(scheduler)
 

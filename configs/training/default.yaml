@@ -1,11 +1,11 @@
 batch_size: 32
 weight_decay: 0.01
-lr: 1e-4
+lr: 5e-3
 max_epochs: 20
 patience: 5
-scheduler: "linear"
+scheduler: "exponential"
 warmup_steps: 10
-do_train: False
-do_predict: True
-ner_cls_path: /content/ner_cls.csv
-intent_cls_path: /content/intent_cls.csv
+do_train: True
+do_predict: False
+ner_cls_path: /content/ner_ptuned_cls.csv
+intent_cls_path: /content/intent_ptuned_cls.csv

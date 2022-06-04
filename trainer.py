@@ -36,8 +36,7 @@ class ATISTrainer:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-        self.run = wandb.init(wandb_project_name, wandb_group_name)
-
+        
         logging.info(f"Strating Training, outputs are saved in {self.output_dir}")
 
     def train_step(self, iterator):

@@ -66,7 +66,7 @@ class ATISDataset(Dataset):
         self.data = data
         self.label_encoder = label_encoder
         self.intent_encoder = intent_encoder
-        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer,add_extra_space=True)
 
     def __len__(self):
         return len(self.data)
