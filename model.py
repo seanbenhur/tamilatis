@@ -1,34 +1,89 @@
 import torch.nn as nn
 from huggingface_hub import PyTorchModelHubMixin
 from transformers import AutoConfig, AutoModelForTokenClassification, PretrainedConfig
-from transformers import RobertaModel, RobertaPreTrainedModel
+from transformers import RobertaModel, RobertaPreTrainedModel, RobertaConfig
 from transformers.modeling_outputs import TokenClassifierOutput
 import torch
 
 
+
+class RobertaPrefixConfig(RobertaConfig):
+    
+    model_type = "roberta"
+
+    def __init__(
+        self,
+        vocab_size=30522,
+        pre_seq_len=64,
+        hidden_size=768,
+        num_hidden_layers=12,
+        num_attention_heads=12,
+        intermediate_size=3072,
+        hidden_act="gelu",
+        hidden_dropout_prob=0.1,
+        attention_probs_dropout_prob=0.1,
+        max_position_embeddings=512,
+        type_vocab_size=2,
+        initializer_range=0.02,
+        layer_norm_eps=1e-12,
+        pad_token_id=0,
+        position_embedding_type="absolute",
+        use_cache=True,
+        classifier_dropout=None,
+        prefix_projection=True,
+        **kwargs
+    ):
+        super().__init__(pad_token_id=pad_token_id, **kwargs)
+
+        self.vocab_size = vocab_size
+        self.pre_seq_len = pre_seq_len
+        self.hidden_size = hidden_size
+        self.num_hidden_layers = num_hidden_layers
+        self.num_attention_heads = num_attention_heads
+        self.hidden_act = hidden_act
+        self.intermediate_size = intermediate_size
+        self.hidden_dropout_prob = hidden_dropout_prob
+        self.attention_probs_dropout_prob = attention_probs_dropout_prob
+        self.max_position_embeddings = max_position_embeddings
+        self.type_vocab_size = type_vocab_size
+        self.initializer_range = initializer_range
+        self.layer_norm_eps = layer_norm_eps
+        self.position_embedding_type = position_embedding_type
+        self.use_cache = use_cache
+        self.classifier_dropout = classifier_dropout
+        self.prefix_projection = prefix_projection 
+
+
+
 class PrefixEncoder(torch.nn.Module):
-    r'''
+    '''
     The torch.nn model to encode the prefix
     Input shape: (batch-size, prefix-length)
     Output shape: (batch-size, prefix-length, 2*layers*hidden)
     '''
     def __init__(self, config):
         super().__init__()
-      #  self.prefix_projection = config.prefix_projection
-       # if self.prefix_projection:
+        self.prefix_projection = True
+        if self.prefix_projection:
             # Use a two-layer MLP to encode the prefix
-        #    self.embedding = torch.nn.Embedding(config.pre_seq_len, config.hidden_size)
-         #   self.trans = torch.nn.Sequential(
-          #      torch.nn.Linear(config.hidden_size, config.prefix_hidden_size),
-           #     torch.nn.Tanh(),
-            #    torch.nn.Linear(config.prefix_hidden_size, config.num_hidden_layers * 2 * config.hidden_size)
-            #)
-        #else:
-        self.embedding = torch.nn.Embedding(64, config.num_hidden_layers * 2 * config.hidden_size)
+            self.embedding = torch.nn.Embedding(64, config.hidden_size)
+            self.trans = torch.nn.Sequential(
+                torch.nn.Linear(config.hidden_size, 512),
+                torch.nn.Tanh(),
+                torch.nn.Linear(512, config.num_hidden_layers * 2 * config.hidden_size)
+            )
+        else:
+          self.embedding = torch.nn.Embedding(64, config.num_hidden_layers * 2 * config.hidden_size)
 
     def forward(self, prefix: torch.Tensor):
-      past_key_values = self.embedding(prefix)
-      return 
+      if self.prefix_projection:
+        prefix_tokens = self.embedding(prefix)
+        past_key_values = self.trans(prefix_tokens)
+      else:
+        past_key_values = self.embedding(prefix)
+      return past_key_values
+
+
 
 class RobertaPrefixForTokenClassification(RobertaPreTrainedModel):
     def __init__(self, config):
@@ -46,11 +101,14 @@ class RobertaPrefixForTokenClassification(RobertaPreTrainedModel):
         self.n_layer = config.num_hidden_layers
         self.n_head = config.num_attention_heads
         self.n_embd = config.hidden_size // config.num_attention_heads
-
+        
         self.prefix_tokens = torch.arange(self.pre_seq_len).long()
         self.prefix_encoder = PrefixEncoder(config)
 
         bert_param = 0
+
+        for param in self.roberta.parameters():
+          param.requires_grad = False
         for name, param in self.roberta.named_parameters():
             bert_param += param.numel()
         all_param = 0
@@ -138,50 +196,6 @@ class RobertaPrefixForTokenClassification(RobertaPreTrainedModel):
         )
 
 
-class RobertaConfig(PretrainedConfig):
-    
-    model_type = "bert"
-
-    def __init__(
-        self,
-        vocab_size=30522,
-        pre_seq_len=64,
-        hidden_size=768,
-        num_hidden_layers=12,
-        num_attention_heads=12,
-        intermediate_size=3072,
-        hidden_act="gelu",
-        hidden_dropout_prob=0.1,
-        attention_probs_dropout_prob=0.1,
-        max_position_embeddings=512,
-        type_vocab_size=2,
-        initializer_range=0.02,
-        layer_norm_eps=1e-12,
-        pad_token_id=0,
-        position_embedding_type="absolute",
-        use_cache=True,
-        classifier_dropout=None,
-        **kwargs
-    ):
-        super().__init__(pad_token_id=pad_token_id, **kwargs)
-
-        self.vocab_size = vocab_size
-        self.pre_seq_len = pre_seq_len
-        self.hidden_size = hidden_size
-        self.num_hidden_layers = num_hidden_layers
-        self.num_attention_heads = num_attention_heads
-        self.hidden_act = hidden_act
-        self.intermediate_size = intermediate_size
-        self.hidden_dropout_prob = hidden_dropout_prob
-        self.attention_probs_dropout_prob = attention_probs_dropout_prob
-        self.max_position_embeddings = max_position_embeddings
-        self.type_vocab_size = type_vocab_size
-        self.initializer_range = initializer_range
-        self.layer_norm_eps = layer_norm_eps
-        self.position_embedding_type = position_embedding_type
-        self.use_cache = use_cache
-        self.classifier_dropout = classifier_dropout
-
 
 class JointATISPtunedModel(nn.Module, PyTorchModelHubMixin):
     def __init__(self, model_name, num_labels, num_intents):
@@ -189,7 +203,7 @@ class JointATISPtunedModel(nn.Module, PyTorchModelHubMixin):
         self.model = RobertaPrefixForTokenClassification.from_pretrained(
             model_name, num_labels=num_labels
         )
-        self.model_config = RobertaConfig.from_pretrained(model_name)
+        self.model_config = RobertaPrefixConfig.from_pretrained(model_name)
         self.intent_head = nn.Linear(self.model_config.hidden_size, num_intents)
 
     def forward(self, input_ids, attention_mask, labels):

@@ -12,7 +12,7 @@ from omegaconf.omegaconf import OmegaConf
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
 import torch
-from transformers import AutoTokenizer, get_scheduler
+from transformers import AutoTokenizer, get_scheduler, set_seed
 
 from dataset import ATISDataset, BuildDataset
 from model import JointATISPtunedModel
@@ -27,8 +27,12 @@ def main(cfg):
 
     os.environ['WANDB_PROJECT'] = cfg.wandb.project_name
     os.environ['WANDB_RUN_GROUP'] = cfg.wandb.group_name
+    set_seed(cfg.training.random_seed)
     #os.environ['WANDB_NAME'] = cfg.wandb.run_name
     logger.info(OmegaConf.to_yaml(cfg, resolve=True))
+    wandb.config = OmegaConf.to_container(
+        cfg, resolve=True, throw_on_missing=True
+    )
     accelerator = Accelerator()
     # Get all tags
     annotations = set()
@@ -93,6 +97,10 @@ def main(cfg):
     model = JointATISPtunedModel(
         cfg.model.model_name, cfg.model.num_labels, cfg.model.num_intents
     )
+    
+
+
+
     criterion = nn.CrossEntropyLoss()
     # Optimizer
     # Split weights in two groups, one with weight decay and the other not.

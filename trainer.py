@@ -32,6 +32,7 @@ class ATISTrainer:
         self.output_dir = output_dir
         self.num_labels = num_labels
         self.num_intents = num_intents
+        self.run = run
 
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -271,9 +272,14 @@ class ATISTrainer:
                 logging.info(train_logs)
                 logging.info(eval_metrics_dict)
 
+                artifact = wandb.Artifact('mmodel', type='checkpoints')
+          
+
                 self.accelerator.wait_for_everyone()
                 model = self.accelerator.unwrap_model(self.model)
                 self.accelerator.save_state(self.output_dir)
                 logging.info(f"Checkpoint is saved in {self.output_dir}")
+                artifact.add_dir(self.output_dir)
+                self.run.log_artifact(artifact)
 
         return best_model, best_eval_loss
