@@ -26,7 +26,7 @@ def main(cfg):
 
     os.environ['WANDB_PROJECT'] = cfg.wandb.project_name
     os.environ['WANDB_RUN_GROUP'] = cfg.wandb.group_name
-    os.environ['WANDB_NAME'] = cfg.wandb.run_name
+    
     logger.info(OmegaConf.to_yaml(cfg, resolve=True))
     accelerator = Accelerator()
     # Get all tags

@@ -36,8 +36,7 @@ class ATISTrainer:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-        self.run = wandb.init(wandb_project_name, wandb_group_name)
-
+        self.run = run
         logging.info(f"Strating Training, outputs are saved in {self.output_dir}")
 
     def train_step(self, iterator):
@@ -77,7 +76,10 @@ class ATISTrainer:
             slot_preds = torch.masked_select(flattened_preds, active_accuracy)
 
             # compute loss for intents
+            #use rlw
             intent_loss = self.criterion(intent_logits, batch["intent"])
+            weight = F.softmax(torch.randn(1), dim=-1) # RLW is only this!
+            intent_loss = torch.sum(intent_loss*weight)
             intent_preds = torch.argmax(intent_logits, axis=1)
             train_loss = slot_loss + intent_loss
             self.accelerator.backward(train_loss)
@@ -118,7 +120,7 @@ class ATISTrainer:
 
             self.run.log(
                 {
-                    "train_loss_step": train_loss,
+                    "train_loss_step": train_loss.detach().cpu(),
                     "train_intent_acc_step": intent_acc,
                     "train_intent_f1_step": intent_f1,
                     "train_slot_acc_step": slot_acc,

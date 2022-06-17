@@ -2,4 +2,4 @@ tokenizer_name: "xlm-roberta-base"
 model_name: "xlm-roberta-base"
 num_labels: 78
 num_intents: 23
-test_model : /content/saved_models/model_0.0828843042254448/pytorch_model.bin
+test_model : 
