@@ -3,7 +3,7 @@ import os
 
 import torch
 import torch.nn as nn
-import torh.nn.functional as F
+import torch.nn.functional as F
 import wandb
 from torchmetrics.functional import accuracy, f1_score, precision, recall
 from tqdm import tqdm, trange
@@ -80,7 +80,7 @@ class ATISTrainer:
             #use rlw
             intent_loss = self.criterion(intent_logits, batch["intent"])
             weight = F.softmax(torch.randn(1), dim=-1) # RLW is only this!
-            intent_loss = torch.sum(intent_loss*weight)
+            intent_loss = torch.sum(intent_loss*weight.cuda())
             intent_preds = torch.argmax(intent_logits, axis=1)
             train_loss = slot_loss + intent_loss
             self.accelerator.backward(train_loss)
@@ -121,7 +121,7 @@ class ATISTrainer:
 
             self.run.log(
                 {
-                    "train_loss_step": train_loss.detach().cpu(),
+                    "train_loss_step": train_loss.cpu().detach().numpy(),
                     "train_intent_acc_step": intent_acc,
                     "train_intent_f1_step": intent_f1,
                     "train_slot_acc_step": slot_acc,
@@ -175,6 +175,9 @@ class ATISTrainer:
 
             # compute loss for intents
             intent_loss = self.criterion(intent_logits, batch["intent"])
+            weight = F.softmax(torch.randn(1), dim=-1) # RLW is only this!
+            intent_loss = torch.sum(intent_loss*weight.cuda())
+            
             intent_preds = torch.argmax(intent_logits, axis=1)
             eval_loss = slot_loss + intent_loss
 
@@ -251,8 +254,6 @@ class ATISTrainer:
                 eval_metrics_dict["eval_slot_acc_epoch"],
             )
 
-            # print(f"TRAIN METRICS{train_metrics_dict}")
-            # print(f"EVAL METRICS{eval_metrics_dict}")
 
             if eval_loss < best_eval_loss:
                 best_model = self.model
