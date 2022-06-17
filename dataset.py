@@ -19,9 +19,8 @@ class BuildDataset:
             start_idx = text.find(token)
             end_idx = start_idx + len(token)
             offsets.append([start_idx, end_idx])
-            return tokens, offsets
-        return list(zip(tokens, boi_tags))
-
+        return tokens, offsets
+        
     def convert_to_boi(self, text, annotations):
         """Convert Intent Tags to BOI Tags"""
         tokens, offsets = self.tokenize(text)
