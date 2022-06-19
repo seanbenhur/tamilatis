@@ -85,10 +85,8 @@ To experiment with this dataset, two multilingual pretrained models are used XLM
 
 ## Findings
 
-<li>
-<ul>The RLW didn't work when used with span loss, The run can be found be found [here]("https://wandb.ai/seanbenhur/tamilatis/runs/9q67z8xl?workspace=user-seanbenhur"), so the results were not included here</ul>
-<ul>XLM large and other large model didn't work</ul>
-</li>
+* The RLW didn't work when used with span loss, The run can be found be found [here]("https://wandb.ai/seanbenhur/tamilatis/runs/9q67z8xl?workspace=user-seanbenhur"), so the results were not included here
+* XLM large and other large model didn't work<
 
 
 
