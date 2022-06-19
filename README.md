@@ -4,17 +4,9 @@
 </h1>
 
 
-## Table of Contents
-
-* [Getting started](#getting-started)
-* [Results](#results)
-	* [Single Task Learning](#single-task-learning)
-	* [Multi Task Learning](#multi-task-learning)
-* [Future Work](#future-work)
-* [Acknowledgments](#acknowledgements)
 
 
-The aim of this project is to develop an intent detction and slot prediction system for Tamil language. An open source dataset from the paper "TamilATIS: Dataset for Task-Oriented Dialog in Tamil (S et al., DravidianLangTech 2022)" was used.Both the Single Task learning based approach and Multi-task learning approaches are experimented. In MultiTask Learning, we use a [Random Loss Weighting]("https://arxiv.org/abs/2111.10603") for intent-detection to account for class-imbalance.
+The aim of this project is to develop an intent detction and slot prediction system for Tamil language. An open source dataset from the paper "TamilATIS: Dataset for Task-Oriented Dialog in Tamil (S et al., DravidianLangTech 2022)" was used.Both the Single Task learning based approach and Multi-task learning approaches are experimented. In MultiTask Learning, we use a [Random Loss Weighting](https://arxiv.org/abs/2111.10603) for intent-detection to account for class-imbalance.
 
 ## Getting Started
 
@@ -32,7 +24,7 @@ The demo for the model is available in Huggingface spaces
 
 As a first step, clone this repo. 
 
-To run the MultiTask Learning experiements, Edit all the configurations in the configs folder.This project uses Hydra as a configuration management tool. If you are new to hydra, I would recommend this [tutorial]("https://www.ravirajag.dev/blog/mlops-hydra-config").
+To run the MultiTask Learning experiements, Edit all the configurations in the configs folder.This project uses Hydra as a configuration management tool. If you are new to hydra, I would recommend this [tutorial](https://www.ravirajag.dev/blog/mlops-hydra-config).
 
 After setting up all the configs, 
 
@@ -79,14 +71,14 @@ To experiment with this dataset, two multilingual pretrained models are used XLM
 
 |     **Model**    | **Accuracy** | **Macro F1** | **Weighted F1** | 
 |:----------------:|:------------:|:------------:|:-----------:|
-| XLM-ROBERTA-BASE  |       0.9600     0.7508      |       |   0.9432    | 
+| XLM-ROBERTA-BASE  |       0.9600       |      0.7508     |   0.9432    | 
 | XLM-ALIGN-BASE          |    0.9243    |    0.7863   |    0.9395   |  
 
 
 ## Findings
 
-* The RLW didn't work when used with span loss, The run can be found be found [here]("https://wandb.ai/seanbenhur/tamilatis/runs/9q67z8xl?workspace=user-seanbenhur"), so the results were not included here
-* XLM large and other large model didn't work<
+* The RLW didn't work when used with span loss, The run can be found be found [here](https://wandb.ai/seanbenhur/tamilatis/runs/9q67z8xl?workspace=user-seanbenhur), so the results were not included here.
+* XLM large and other large model didn't work
 
 
 
