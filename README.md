@@ -5,7 +5,6 @@
 
 
 
-
 The aim of this project is to develop an intent detction and slot prediction system for Tamil language. An open source dataset from the paper "TamilATIS: Dataset for Task-Oriented Dialog in Tamil (S et al., DravidianLangTech 2022)" was used.Both the Single Task learning based approach and Multi-task learning approaches are experimented. In MultiTask Learning, we use a [Random Loss Weighting](https://arxiv.org/abs/2111.10603) for intent-detection to account for class-imbalance.
 
 ## Getting Started
@@ -18,7 +17,7 @@ To get the dataset, email the authors of the paper "TamilATIS: Dataset for Task-
 
 ### Demo
 
-The demo for the model is available in Huggingface spaces
+The demo for this project is available [here](https://huggingface.co/spaces/seanbenhur/tamilatis)
 
 ### Usage
 
