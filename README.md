@@ -45,6 +45,9 @@ To experiment with this dataset, two multilingual pretrained models are used XLM
 |:----------------:|:------------:|:------------:|:-----------:|
 | XLM-ROBERTA-BASE             |    0.9252   |    0.4080   |    0.9166 | 
 | XLM-ALIGN-BASE          |  0.9013    | 0.2506    |  0.8839   |  
+| MURIL-BASE        |  0.8146   |  0.0498   |  0.7314 |  
+| MURIL-LARGE          |  0.8968   | 0.2290    |  0.8715  |  
+
 
 
 #### Slot Filling
@@ -53,6 +56,8 @@ To experiment with this dataset, two multilingual pretrained models are used XLM
 |:----------------:|:------------:|:------------:|:-----------:|
 | XLM-ROBERTA-BASE             |    0.9507  |    0.6298    |    0.9205  | 
 | XLM-ALIGN-BASE          |    0.9428   | 0.57       | 0.89      |  
+| MURIL-BASE          |    0.6437   | 0.0635      | 0.5456      | 
+| MURIL-LARGE          |   0.96    |    0.7611    |  0.9548    |  
 
 
 
@@ -64,6 +69,13 @@ To experiment with this dataset, two multilingual pretrained models are used XLM
 |:----------------:|:------------:|:------------:|:-----------:|
 | XLM-ROBERTA-BASE    |    0.9476  |    0.6458    |    0.9434   |          
 | XLM-ALIGN-BASE          |    0.9566    |    0.5828   |    0.9521  |  
+! MURIL-BASE          |    0.9581    |    	0.5959   |   0.9530  |  
+! MURIL-LARGE          |    0.9596    |    	0.6202   |   0.9552  |  
+
+
+
+
+
 
 
 #### Slot Filling
@@ -72,12 +84,15 @@ To experiment with this dataset, two multilingual pretrained models are used XLM
 |:----------------:|:------------:|:------------:|:-----------:|
 | XLM-ROBERTA-BASE  |       0.9600       |      0.7508     |   0.9432    | 
 | XLM-ALIGN-BASE          |    0.9243    |    0.7863   |    0.9395   |  
+| MURIL-BASE          |    0.9407    |    0.6434  |    0.9301  |  
+| MURIL-LARGE          |    0.95    |    0.7577  |   0.9467  |  
+
 
 
 ## Findings
 
 * The RLW didn't work when used with span loss, The run can be found be found [here](https://wandb.ai/seanbenhur/tamilatis/runs/9q67z8xl?workspace=user-seanbenhur), so the results were not included here.
-* XLM large and other large model didn't work
+* XLM large model didn't provide decent results
 
 
 
